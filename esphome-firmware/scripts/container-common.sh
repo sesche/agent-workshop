@@ -5,9 +5,10 @@ set -euo pipefail
 project_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 podman_bin="${PODMAN_BIN:-podman}"
 container_image="${ESPHOME_CONTAINER_IMAGE:-localhost/esphome-firmware:latest}"
-container_workspace="/workspace"
+container_config_root="/config"
 host_cache_root="${ESPHOME_CONTAINER_CACHE_DIR:-$project_root/.podman-cache}"
-container_cache_root="$container_workspace/.podman-cache"
+container_cache_root="$container_config_root/.podman-cache"
+host_secrets_file="$project_root/secrets.yaml"
 
 require_podman() {
   if ! command -v "$podman_bin" >/dev/null 2>&1; then
@@ -38,22 +39,43 @@ prepare_container_cache() {
   mkdir -p \
     "$host_cache_root/home" \
     "$host_cache_root/cache" \
-    "$host_cache_root/platformio"
+    "$host_cache_root/platformio" \
+    "$host_cache_root/esphome"
 }
 
 run_esphome_in_container() {
+  local podman_args=()
+
   ensure_container_image
   prepare_container_cache
 
-  "$podman_bin" run --rm \
+  podman_args=(
+    run
+    --rm
     --userns keep-id \
     --user "$(id -u):$(id -g)" \
-    --volume "$project_root:$container_workspace" \
+    --volume "$project_root:$container_config_root" \
+    --volume "$host_cache_root/esphome:$container_config_root/.esphome" \
     --volume "$host_cache_root:$container_cache_root" \
-    --workdir "$container_workspace" \
+    --workdir "$container_config_root" \
     --env "HOME=$container_cache_root/home" \
     --env "XDG_CACHE_HOME=$container_cache_root/cache" \
     --env "PLATFORMIO_CORE_DIR=$container_cache_root/platformio" \
-    "$container_image" \
+  )
+
+  if [ -f "$host_secrets_file" ]; then
+    # ESPHome resolves !secret lookups relative to the active file and included packages,
+    # so mount the repo-level secrets file into the locations it probes for this layout.
+    podman_args+=(
+      --volume "$host_secrets_file:$container_config_root/devices/secrets.yaml:ro"
+      --volume "$host_secrets_file:$container_config_root/packages/common/secrets.yaml:ro"
+    )
+  fi
+
+  podman_args+=(
+    "$container_image"
     "$@"
+  )
+
+  "$podman_bin" "${podman_args[@]}"
 }
