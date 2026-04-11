@@ -1,0 +1,38 @@
+switch:
+  - platform: gpio
+    id: optocoupler_output
+    internal: true
+    restore_mode: ALWAYS_OFF
+    pin:
+      number: ${trigger_gpio}
+      inverted: ${trigger_inverted}
+
+number:
+  - platform: template
+    id: press_duration_seconds
+    name: "${friendly_name} Press Duration"
+    icon: mdi:timer-outline
+    unit_of_measurement: s
+    optimistic: true
+    restore_value: true
+    initial_value: ${default_press_duration}
+    min_value: ${min_press_duration}
+    max_value: ${max_press_duration}
+    step: ${press_duration_step}
+    mode: box
+
+button:
+  - platform: template
+    name: "${friendly_name} Simulate Button Press"
+    icon: mdi:gesture-tap-button
+    on_press:
+      - script.execute: simulate_button_press
+
+script:
+  - id: simulate_button_press
+    mode: restart
+    then:
+      - switch.turn_on: optocoupler_output
+      - delay: !lambda |-
+          return static_cast<uint32_t>(id(press_duration_seconds).state * 1000.0f);
+      - switch.turn_off: optocoupler_output

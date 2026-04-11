@@ -1,0 +1,20 @@
+substitutions:
+  device_name: esp32-c3-833mhz-smart-remote
+  friendly_name: 833 MHz Smart Remote
+  board: esp32-c3-devkitm-1
+
+  # GPIO anpassen, falls dein ESP32-C3-Board den Optokoppler an einem anderen Pin ansteuert.
+  trigger_gpio: GPIO7
+
+  # Auf true setzen, wenn der Optokoppler bei LOW statt HIGH leitend wird.
+  trigger_inverted: "false"
+
+  default_press_duration: "1"
+  min_press_duration: "0.2"
+  max_press_duration: "15"
+  press_duration_step: "0.1"
+
+packages:
+  base: !include ../packages/common/device-base.yaml
+  telemetry: !include ../packages/common/telemetry.yaml
+  momentary_opto_button: !include ../packages/common/momentary-opto-button.yaml

@@ -1,0 +1,8 @@
+substitutions:
+  device_name: example-esp32-devkit
+  friendly_name: Example ESP32 DevKit
+  board: esp32dev
+
+packages:
+  base: !include ../packages/common/device-base.yaml
+  telemetry: !include ../packages/common/telemetry.yaml
