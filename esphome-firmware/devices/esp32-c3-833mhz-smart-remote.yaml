@@ -3,10 +3,10 @@ substitutions:
   friendly_name: 833 MHz Smart Remote
   board: esp32-c3-devkitm-1
 
-  # GPIO anpassen, falls dein ESP32-C3-Board den Optokoppler an einem anderen Pin ansteuert.
+  # Adjust GPIO if your ESP32-C3 board drives the optocoupler on a different pin.
   trigger_gpio: GPIO7
 
-  # Auf true setzen, wenn der Optokoppler bei LOW statt HIGH leitend wird.
+  # Set to true if the optocoupler conducts on LOW instead of HIGH.
   trigger_inverted: "false"
 
   default_press_duration: "1"
