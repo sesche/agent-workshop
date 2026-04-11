@@ -2,6 +2,7 @@
 .pioenvs/
 .piolibdeps/
 build/
+.podman-cache/
 secrets.yaml
 *.bin
 *.factory.bin
