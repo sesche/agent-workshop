@@ -45,6 +45,27 @@ prepare_container_cache() {
 
 run_esphome_in_container() {
   local podman_args=()
+  local extra_podman_args=()
+
+  while [ "$#" -gt 0 ]; do
+    case "$1" in
+      --podman-arg)
+        if [ "$#" -lt 2 ]; then
+          echo "Missing value for --podman-arg"
+          exit 1
+        fi
+        extra_podman_args+=("$2")
+        shift 2
+        ;;
+      --)
+        shift
+        break
+        ;;
+      *)
+        break
+        ;;
+    esac
+  done
 
   ensure_container_image
   prepare_container_cache
@@ -61,6 +82,7 @@ run_esphome_in_container() {
     --env "HOME=$container_cache_root/home" \
     --env "XDG_CACHE_HOME=$container_cache_root/cache" \
     --env "PLATFORMIO_CORE_DIR=$container_cache_root/platformio" \
+    "${extra_podman_args[@]}"
   )
 
   if [ -f "$host_secrets_file" ]; then

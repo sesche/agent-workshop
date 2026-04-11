@@ -36,7 +36,10 @@ This subproject is a small but practical starting point for developing ESPHome-b
 ```bash
 esphome run devices/example-esp32-devkit.yaml
 esphome run devices/esp32-c3-833mhz-smart-remote.yaml
+./scripts/upload-usb.sh devices/example-esp32-devkit.yaml /dev/ttyUSB0
 ```
+
+You can also set `ESPHOME_SERIAL_PORT=/dev/ttyUSB0` and omit the second script argument. The upload helper runs ESPHome inside the same Podman image used by the other container scripts and passes the selected serial device through to the container.
 
 ## Podman Workflow
 
