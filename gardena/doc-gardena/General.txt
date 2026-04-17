@@ -1,0 +1,5 @@
+Name	GARDENA smart system API
+Base URL	https://api.smart.gardena.dev/v2
+Version	2.3.4
+
+Source: https://developer.husqvarnagroup.cloud/apis/gardena-smart-system-api
